@@ -14,17 +14,22 @@ class Livro(BaseModel):
 # ROTAS GET 
 @app.get('/livros')
 def listar_livros(livro:Livro):
-    return {
-       'titulo': livro,
-       'autor': livro
-    }
+   return [
+        {
+            "titulo": "Dom Casmurro",
+            "autor": "Machado de Assis"
+        },
+        {
+            "titulo": "1984",
+            "autor": "George Orwell"
+        }
+    ]
 
 
 @app.get('/livros/{id}')
-def buscar_livro(id:int,livro:Livro):
+def buscar_livro(id:int):
     return {
        'id': id,
-       'livro':livro
     }
 
 
