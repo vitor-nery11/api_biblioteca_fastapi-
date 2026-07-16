@@ -26,5 +26,15 @@ def buscar_livro(id:int,livro:Livro):
     }
 
 
+# ROTAS POST 
+app.post('/livros')
+def criar_livro(livro:Livro):
+    return {
+        'livro':livro
+    }
+
+
+
+
 
 
