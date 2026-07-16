@@ -43,5 +43,18 @@ def atualizar_livro(id:int, livro:Livro):
     }
 
 
+# ROTA DELETE 
+@app.delete('/livros/{id}')
+def deletar_livro(id: int):
+    return {
+        'mensagem': 'livro removido',
+        'id': id
+    }
+
+
+
+
+
+
 
 
