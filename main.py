@@ -3,11 +3,13 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class Livro(BaseModel):
   titulo:str 
   autor:str 
   paginas:int 
-  disponivel:str
+  disponivel:bool
+  ano_publicacao:int
 
 # ROTAS GET 
 @app.get('/livros')
