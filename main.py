@@ -27,13 +27,20 @@ def buscar_livro(id:int,livro:Livro):
 
 
 # ROTAS POST 
-app.post('/livros')
+@app.post('/livros')
 def criar_livro(livro:Livro):
     return {
         'livro':livro
     }
 
 
+# ROTAS PUT
+@app.put('/livros/{id}')
+def atualizar_livro(id:int, livro:Livro):
+    return {
+        'id':id ,
+        'livro':livro
+    }
 
 
 
