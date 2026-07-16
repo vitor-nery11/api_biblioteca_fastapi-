@@ -12,6 +12,11 @@ class Livro(BaseModel):
   ano_publicacao:int
 
 # ROTAS GET 
+@app.get('/')
+def raiz():
+    return {'message': 'Ola Mundo!'}
+
+
 @app.get('/livros')
 def listar_livros(livro:Livro):
    return [
