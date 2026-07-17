@@ -4,6 +4,8 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
+livros = []
+
 class Livro(BaseModel):
   titulo:str 
   autor:str 
@@ -18,49 +20,40 @@ def raiz():
 
 
 @app.get('/livros')
-def listar_livros(livro:Livro):
-   return [
-        {
-            "titulo": "Dom Casmurro",
-            "autor": "Machado de Assis"
-        },
-        {
-            "titulo": "1984",
-            "autor": "George Orwell"
-        }
-    ]
+def listar_livros():
+    return livros
 
 
 @app.get('/livros/{id}')
 def buscar_livro(id:int):
-    return {
-       'id': id,
-    }
+    return livros[id]
 
 
 # ROTAS POST 
 @app.post('/livros')
 def criar_livro(livro:Livro):
+    livros.append(livro)
     return {
-        'livro':livro
+        'mensagem': 'Livro cadastrado com sucesso'
     }
 
 
 # ROTAS PUT
 @app.put('/livros/{id}')
 def atualizar_livro(id:int, livro:Livro):
+    livros[id]= livro
     return {
-        'id':id ,
-        'livro':livro
+        'mensagem': 'livro atualizado com sucesso'
     }
+
 
 
 # ROTA DELETE 
 @app.delete('/livros/{id}')
 def deletar_livro(id: int):
+    livros.pop(id)
     return {
-        'mensagem': 'livro removido',
-        'id': id
+        'mensagem': 'livro removido'
     }
 
 
