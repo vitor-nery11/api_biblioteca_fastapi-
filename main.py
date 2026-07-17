@@ -26,7 +26,7 @@ def listar_livros():
 
 @app.get('/livros/{id}')
 def buscar_livro(id:int):
-    if id < 0 and id >= len(livros):
+    if id < 0 or id >= len(livros):
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
@@ -47,7 +47,7 @@ def criar_livro(livro:Livro):
 # ROTAS PUT
 @app.put('/livros/{id}')
 def atualizar_livro(id:int, livro:Livro):
-    if id < 0 and id >= len(livros):
+    if id < 0 or id >= len(livros):
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
@@ -62,7 +62,7 @@ def atualizar_livro(id:int, livro:Livro):
 # ROTA DELETE 
 @app.delete('/livros/{id}')
 def deletar_livro(id: int):
-    if id < 0 and id >= len(livros):
+    if id < 0 or id >= len(livros):
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
