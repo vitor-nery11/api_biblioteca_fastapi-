@@ -1,22 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from schemas.livro import LivroCreate,LivroResponse
 
 app = FastAPI()
 
-
 livros = []
-
-
-class LivroCreate(BaseModel):
-  titulo:str 
-  autor:str 
-  paginas:int 
-  disponivel:bool
-  ano_publicacao:int
-
-class LivroResponse(BaseModel):
-    titulo:str 
-    autor:str 
 
 # ROTAS GET 
 @app.get('/')
