@@ -6,12 +6,17 @@ app = FastAPI()
 
 livros = []
 
-class Livro(BaseModel):
+
+class LivroCreate(BaseModel):
   titulo:str 
   autor:str 
   paginas:int 
   disponivel:bool
   ano_publicacao:int
+
+class LivroResponse(BaseModel):
+    titulo:str 
+    autor:str 
 
 # ROTAS GET 
 @app.get('/')
@@ -36,17 +41,15 @@ def buscar_livro(id:int):
 
 
 # ROTAS POST 
-@app.post('/livros')
-def criar_livro(livro:Livro):
+@app.post('/livros', response_model=LivroResponse)
+def criar_livro(livro:LivroCreate):
     livros.append(livro)
-    return {
-        'mensagem': 'Livro cadastrado com sucesso'
-    }
+    return livro 
 
 
 # ROTAS PUT
 @app.put('/livros/{id}')
-def atualizar_livro(id:int, livro:Livro):
+def atualizar_livro(id:int, livro:LivroCreate):
     if id < 0 or id >= len(livros):
         raise HTTPException(
             status_code=404,
