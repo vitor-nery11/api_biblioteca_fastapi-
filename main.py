@@ -1,9 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from schemas.livro import LivroCreate,LivroResponse
+from database import Base, engine,SessionLocal
+from models.livro import Livro 
+
+
 
 app = FastAPI()
 
 livros = []
+
+Base.metadata.create_all(bind=engine)
 
 # ROTAS GET 
 @app.get('/')
@@ -30,8 +36,25 @@ def buscar_livro(id:int):
 # ROTAS POST 
 @app.post('/livros', response_model=LivroResponse)
 def criar_livro(livro:LivroCreate):
-    livros.append(livro)
-    return livro 
+    db = SessionLocal()
+
+    novo_livro = Livro(
+        titulo = livro.titulo,
+        autor = livro.autor,
+        paginas = livro.paginas,
+        disponivel = livro.disponivel,
+        ano_publicacao = livro.ano_publicacao
+    )
+    
+    db.add(novo_livro)
+
+    db.commit()
+
+    db.refresh(novo_livro)
+
+    db.close()
+
+    return novo_livro 
 
 
 # ROTAS PUT
