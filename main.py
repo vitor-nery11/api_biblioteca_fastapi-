@@ -19,18 +19,33 @@ def raiz():
 
 @app.get('/livros')
 def listar_livros():
+
+    db = SessionLocal()
+
+    livros = db.query(Livro).all()
+
+    db.close()
+
     return livros
+
 
 
 @app.get('/livros/{id}')
 def buscar_livro(id:int):
-    if id < 0 or id >= len(livros):
+
+    db = SessionLocal()
+
+    livro = db.query(Livro).filter(Livro.id == id).first()
+
+    db.close()
+
+    if livro is None:
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
         )
 
-    return livros[id]
+    return livro
 
 
 # ROTAS POST 
