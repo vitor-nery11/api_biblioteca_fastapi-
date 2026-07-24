@@ -75,15 +75,28 @@ def criar_livro(livro:LivroCreate):
 # ROTAS PUT
 @app.put('/livros/{id}')
 def atualizar_livro(id:int, livro:LivroCreate):
-    if id < 0 or id >= len(livros):
+
+    db = SessionLocal()
+
+    livro_db = db.query(Livro).filter(Livro.id == id).first()
+
+    if livro_db is None:
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
         )
-    livros[id]= livro
-    return {
-        'mensagem': 'livro atualizado com sucesso'
-    }
+
+    livro_db.titulo = livro.titulo
+    livro_db.autor = livro.autor
+    livro_db.paginas = livro.paginas
+    livro_db.disponivel = livro.disponivel
+    livro_db.ano_publicacao = livro.ano_publicacao
+
+    db.commit()
+    db.refresh(livro_db)
+    db.close()
+
+    return livro_db
 
 
 
