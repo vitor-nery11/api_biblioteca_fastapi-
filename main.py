@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,Depends
+from sqlalchemy.orm import Session
 from schemas.livro import LivroCreate,LivroResponse
 from database import Base, engine,SessionLocal
 from models.livro import Livro 
@@ -18,15 +19,11 @@ def raiz():
 
 
 @app.get('/livros')
-def listar_livros():
+def listar_livros(db:Session = Depends(get_db)):
 
-    db = SessionLocal()
 
-    livros = db.query(Livro).all()
 
-    db.close()
-
-    return livros
+    return db.query(Livro).all()
 
 
 
@@ -116,7 +113,7 @@ def deletar_livro(id: int):
     db.delete(livro_db)
     db.commit()
     db.close()
-    
+
     return {
         'mensagem': 'livro removido'
     }
