@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from schemas.livro import LivroCreate,LivroResponse
 from database import Base, engine,SessionLocal,get_db
 from models.livro import Livro 
+from repositories.livro_repositories import buscar_por_id
 
 
 
@@ -28,7 +29,7 @@ def listar_livros(db:Session = Depends(get_db)):
 @app.get('/livros/{id}')
 def buscar_livro(id:int, db: Session = Depends(get_db)):
 
-    livro = db.query(Livro).filter(Livro.id == id).first()
+    livro = buscar_por_id(db, id)
 
     if livro is None:
         raise HTTPException(
