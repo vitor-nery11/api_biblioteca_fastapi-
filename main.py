@@ -103,12 +103,20 @@ def atualizar_livro(id:int, livro:LivroCreate):
 # ROTA DELETE 
 @app.delete('/livros/{id}')
 def deletar_livro(id: int):
+
+    db = SessionLocal()
+
+    livro_db = db.query(Livro).filter(Livro.id == id).first()
     if id < 0 or id >= len(livros):
         raise HTTPException(
             status_code=404,
             detail='Livro não encontrado'
         )
-    livros.pop(id)
+
+    db.delete(livro_db)
+    db.commit()
+    db.close()
+    
     return {
         'mensagem': 'livro removido'
     }
