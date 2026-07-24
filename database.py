@@ -1,14 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase,sessionmaker,Session
 
-def get_db():
-    db = SessionLocal()
-
-    try:
-       yield db 
-
-    finally:
-       db.close()
 
 
 DATABASE_URL = 'sqlite:///biblioteca.db'
@@ -20,4 +12,13 @@ class Base(DeclarativeBase):
 
 
 SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+
+    try:
+       yield db 
+
+    finally:
+       db.close()
 

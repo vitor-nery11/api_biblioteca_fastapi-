@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException,Depends
 from sqlalchemy.orm import Session
 from schemas.livro import LivroCreate,LivroResponse
-from database import Base, engine,SessionLocal
+from database import Base, engine,SessionLocal,get_db
 from models.livro import Livro 
 
 
@@ -21,20 +21,14 @@ def raiz():
 @app.get('/livros')
 def listar_livros(db:Session = Depends(get_db)):
 
-
-
     return db.query(Livro).all()
 
 
 
 @app.get('/livros/{id}')
-def buscar_livro(id:int):
-
-    db = SessionLocal()
+def buscar_livro(id:int, db: Session = Depends(get_db)):
 
     livro = db.query(Livro).filter(Livro.id == id).first()
-
-    db.close()
 
     if livro is None:
         raise HTTPException(
@@ -47,8 +41,7 @@ def buscar_livro(id:int):
 
 # ROTAS POST 
 @app.post('/livros', response_model=LivroResponse)
-def criar_livro(livro:LivroCreate):
-    db = SessionLocal()
+def criar_livro(livro:LivroCreate, db: Session = Depends(get_db)):
 
     novo_livro = Livro(
         titulo = livro.titulo,
@@ -64,16 +57,12 @@ def criar_livro(livro:LivroCreate):
 
     db.refresh(novo_livro)
 
-    db.close()
-
     return novo_livro 
 
 
 # ROTAS PUT
 @app.put('/livros/{id}')
-def atualizar_livro(id:int, livro:LivroCreate):
-
-    db = SessionLocal()
+def atualizar_livro(id:int, livro:LivroCreate, db: Session = Depends(get_db)):
 
     livro_db = db.query(Livro).filter(Livro.id == id).first()
 
@@ -91,7 +80,6 @@ def atualizar_livro(id:int, livro:LivroCreate):
 
     db.commit()
     db.refresh(livro_db)
-    db.close()
 
     return livro_db
 
@@ -99,9 +87,7 @@ def atualizar_livro(id:int, livro:LivroCreate):
 
 # ROTA DELETE 
 @app.delete('/livros/{id}')
-def deletar_livro(id: int):
-
-    db = SessionLocal()
+def deletar_livro(id: int, db: Session = Depends(get_db)):
 
     livro_db = db.query(Livro).filter(Livro.id == id).first()
     if id < 0 or id >= len(livros):
@@ -112,7 +98,6 @@ def deletar_livro(id: int):
 
     db.delete(livro_db)
     db.commit()
-    db.close()
 
     return {
         'mensagem': 'livro removido'
