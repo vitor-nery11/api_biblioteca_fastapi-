@@ -1,113 +1,62 @@
-from fastapi import FastAPI, HTTPException,Depends
+from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from schemas.livro import LivroCreate,LivroResponse
-from database import Base, engine,SessionLocal,get_db
-from models.livro import Livro 
-from repositories.livro_repositories import buscar_por_id
 
-
+from schemas.livro import LivroCreate, LivroResponse
+from database import Base, engine, get_db
+from models.livro import Livro
+from models.usuario import Usuario
+from services.livro_service import (
+    listar_livro,
+    buscar_livro,
+    criar_livro,
+    atualizar_livro,
+    deletar_livro,
+)
 
 app = FastAPI()
 
-livros = []
-
 Base.metadata.create_all(bind=engine)
 
-# ROTAS GET 
-@app.get('/')
+@app.get("/")
 def raiz():
-    return {'message': 'Ola Mundo!'}
+    return {"message": "Ola Mundo!"}
 
 
-@app.get('/livros')
-def listar_livros(db:Session = Depends(get_db)):
-
-    return db.query(Livro).all()
-
+@app.get("/livros")
+def listar_livros_route(db: Session = Depends(get_db)):
+    return listar_livro(db)
 
 
-@app.get('/livros/{id}')
-def buscar_livro(id:int, db: Session = Depends(get_db)):
-
-    livro = buscar_por_id(db, id)
-
-    if livro is None:
-        raise HTTPException(
-            status_code=404,
-            detail='Livro não encontrado'
-        )
-
-    return livro
+@app.get("/livros/{id}")
+def buscar_livros_route(id: int, db: Session = Depends(get_db)):
+    return buscar_livro(db, id)
 
 
-# ROTAS POST 
-@app.post('/livros', response_model=LivroResponse)
-def criar_livro(livro:LivroCreate, db: Session = Depends(get_db)):
-
-    novo_livro = Livro(
-        titulo = livro.titulo,
-        autor = livro.autor,
-        paginas = livro.paginas,
-        disponivel = livro.disponivel,
-        ano_publicacao = livro.ano_publicacao
+@app.post("/livros", response_model=LivroResponse)
+def criar_livros_route(livro: LivroCreate, db: Session = Depends(get_db)):
+    novo = Livro(
+        titulo=livro.titulo,
+        autor=livro.autor,
+        paginas=livro.paginas,
+        disponivel=livro.disponivel,
+        ano_publicacao=livro.ano_publicacao,
     )
-    
-    db.add(novo_livro)
-
-    db.commit()
-
-    db.refresh(novo_livro)
-
-    return novo_livro 
+    return criar_livro(db, novo)
 
 
-# ROTAS PUT
-@app.put('/livros/{id}')
-def atualizar_livro(id:int, livro:LivroCreate, db: Session = Depends(get_db)):
-
-    livro_db = db.query(Livro).filter(Livro.id == id).first()
-
-    if livro_db is None:
-        raise HTTPException(
-            status_code=404,
-            detail='Livro não encontrado'
-        )
-
-    livro_db.titulo = livro.titulo
-    livro_db.autor = livro.autor
-    livro_db.paginas = livro.paginas
-    livro_db.disponivel = livro.disponivel
-    livro_db.ano_publicacao = livro.ano_publicacao
-
-    db.commit()
-    db.refresh(livro_db)
-
-    return livro_db
+@app.put("/livros/{id}")
+def atualizar_livros_route(id: int, livro: LivroCreate, db: Session = Depends(get_db)):
+    novo = Livro(
+        titulo=livro.titulo,
+        autor=livro.autor,
+        paginas=livro.paginas,
+        disponivel=livro.disponivel,
+        ano_publicacao=livro.ano_publicacao,
+    )
+    return atualizar_livro(db, id, novo)
 
 
-
-# ROTA DELETE 
-@app.delete('/livros/{id}')
-def deletar_livro(id: int, db: Session = Depends(get_db)):
-
-    livro_db = db.query(Livro).filter(Livro.id == id).first()
-    if id < 0 or id >= len(livros):
-        raise HTTPException(
-            status_code=404,
-            detail='Livro não encontrado'
-        )
-
-    db.delete(livro_db)
-    db.commit()
-
-    return {
-        'mensagem': 'livro removido'
-    }
-
-
-
-
-
-
-
-
+@app.delete("/livros/{id}")
+def deletar_livros_route(id: int, db: Session = Depends(get_db)):
+    deletar_livro(db, id)
+    return {"mensagem": "Livro removido com sucesso"}
