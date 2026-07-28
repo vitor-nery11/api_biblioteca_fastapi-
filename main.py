@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from schemas.livro import LivroCreate, LivroResponse
 from database import Base, engine, get_db
 from models.livro import Livro
-from models.usuario import Usuario
+from models.usuario import Usuario  
 from services.livro_service import (
     listar_livro,
     buscar_livro,
