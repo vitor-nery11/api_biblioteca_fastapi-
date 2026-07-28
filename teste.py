@@ -1,3 +1,8 @@
-from security import gerar_hash
+from security import criar_token
 
-print(gerar_hash('123456'))
+token = criar_token({
+   "sub": "vitor@gmail.com"
+}
+)
+
+print(token)
