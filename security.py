@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
 from jose import jwt,JWTError
-from fastapi.security import OAuth2AuthorizationCodeBearer
-from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException
 from datetime import datetime,timedelta
 from sqlalchemy.orm import Session
 from database import get_db
@@ -17,7 +17,7 @@ ALGORITHM = 'HS256'
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
+oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl='login'
 
 )
@@ -38,20 +38,27 @@ def get_usuario_logado(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)     
 ):
-    payload = jwt.decode(
-        token,
-        SECRET_KEY,
-        algorithms=[ALGORITHM]
-    )
-
-    email = payload.get('sub')
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+        email = payload.get('sub')
+        if email is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Não autorizado")
 
     usuario = buscar_usuario_email(
         db,
         email
     )
 
-    print(usuario)
+    if usuario is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+    return usuario
 
 
 

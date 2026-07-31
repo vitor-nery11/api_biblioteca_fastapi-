@@ -1,6 +1,38 @@
-from repositories.usuario_repositories import buscar_usuario_email
-from security import verificar_senha, criar_token
 from fastapi import HTTPException
+from models.usuario import Usuario
+
+from repositories.usuario_repositories import (
+    buscar_usuario_email,
+    criar_usuario
+)
+
+from security import (
+    verificar_senha,
+    criar_token,
+    gerar_hash
+)
+
+
+def cadastrar_usuario(db, nome, email, senha):
+
+    usuario_existente = buscar_usuario_email(db, email)
+
+    if usuario_existente:
+        raise HTTPException(
+            status_code=400,
+            detail="Email já cadastrado"
+        )
+
+    senha_hash = gerar_hash(senha)
+
+    usuario = Usuario(
+        nome=nome,
+        email=email,
+        senha=senha_hash
+    )
+
+    return criar_usuario(db, usuario)
+
 
 def login(db, email, senha):
 
